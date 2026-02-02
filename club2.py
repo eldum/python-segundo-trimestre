@@ -5,11 +5,16 @@ class Jugador:
         self.equipo = None
 
     def añadir_equipo(self, equipo):
+        if self.equipo:
+            self.equipo.jugadores_eq.remove(self)
         self.equipo = equipo
         equipo.añadir_jugador(self) 
     
     def mostrar(self):
-        print(f"{self.dorsal}.{self.nombre}: {self.equipo.nombre_equipo}")
+        if self.equipo:
+            print(f"{self.dorsal}. {self.nombre}: {self.equipo.nombre_equipo}")
+        else:
+            print(f"{self.dorsal}. {self.nombre}: Sin equipo")
     
 class Equipo:
     def __init__(self, nom_eq):
@@ -17,66 +22,83 @@ class Equipo:
         self.jugadores_eq = []
 
     def añadir_jugador(self, jugador):  
-        self.jugadores_eq.append(jugador)
+        if jugador not in self.jugadores_eq:
+            self.jugadores_eq.append(jugador)
 
-equipo1 = Equipo("FC Barcelona")
-equipo2 = Equipo("Real Madrid")
-equipo3 = Equipo("Atletico Madrid")
+    def mostrar_jugadores(self):
+        if not self.jugadores_eq:
+            print(f"El equipo {self.nombre_equipo} no tiene jugadores.")
+        else:
+            print(f"\nJugadores del {self.nombre_equipo}:")
+            for jugador in self.jugadores_eq:
+                print(f"  {jugador.dorsal}. {jugador.nombre}")
 
-print("EQUIPOS:")
-print("1 - FC Barcelona")
-print("2 - Real Madrid") 
-print("3 - Atletico Madrid")
+# Listas globales
+equipos = []
+jugadores = []
 
-nombre1 = input("nombre jugador 1: ")
-dorsal1 = int(input("dorsal jugador 1: "))
-equipo_num1 = input("equipo (1, 2 o 3): ")
-
-jugador1 = Jugador(dorsal1, nombre1)
-
-if equipo_num1 == "1":
-    jugador1.añadir_equipo(equipo1)
-elif equipo_num1 == "2":
-    jugador1.añadir_equipo(equipo2)
-elif equipo_num1 == "3":
-    jugador1.añadir_equipo(equipo3)
-else:
-    print("Equipo inválido")
-
-nombre2 = input("nombre jugador 2: ")
-dorsal2 = int(input("dorsal jugador 2: "))
-equipo_num2 = input("equipo (1, 2 o 3): ")
-
-jugador2 = Jugador(dorsal2, nombre2)
-
-if equipo_num2 == "1":
-    jugador2.añadir_equipo(equipo1)
-elif equipo_num2 == "2":
-    jugador2.añadir_equipo(equipo2)
-elif equipo_num2 == "3":
-    jugador2.añadir_equipo(equipo3)
-else:
-    print("Equipo inválido")
-
-nombre3 = input("nombre jugador 3: ")
-dorsal3 = int(input("dorsal jugador 3: "))
-equipo_num3 = input("equipo (1, 2 o 3): ")
-
-jugador3 = Jugador(dorsal3, nombre3)
-
-if equipo_num3 == "1":
-    jugador3.añadir_equipo(equipo1)
-elif equipo_num3 == "2":
-    jugador3.añadir_equipo(equipo2)
-elif equipo_num3 == "3":         
-    jugador3.añadir_equipo(equipo3)
-else:
-    print("Equipo inválido")
-
-
-print("\n=== EQUIPOS Y JUGADORES ===")
-for equipo in [equipo1, equipo2, equipo3]:
-    if equipo.jugadores_eq:  
-        print(f"\n{equipo.nombre_equipo}:")
-        for jugador in equipo.jugadores_eq:
-            jugador.mostrar()
+# Menú principal
+while True:
+    print("\n=== GESTOR DE CLUB DE FÚTBOL ===")
+    print("1. Crear equipo")
+    print("2. Crear jugador")
+    print("3. Asignar equipo a jugador")
+    print("4. Listar equipos")
+    print("5. Listar jugadores de un equipo")
+    print("6. Salir")
+    
+    opcion = input("Seleccione una opción: ")
+    
+    if opcion == "1":
+        nombre = input("Nombre del equipo: ")
+        nuevo_equipo = Equipo(nombre)
+        equipos.append(nuevo_equipo)
+        print(f"Equipo '{nombre}' creado exitosamente.")
+        
+    elif opcion == "2":
+        nombre = input("Nombre del jugador: ")
+        dorsal = int(input("Dorsal del jugador: "))
+        nuevo_jugador = Jugador(dorsal, nombre)
+        jugadores.append(nuevo_jugador)
+        print(f"Jugador '{nombre}' con dorsal {dorsal} creado exitosamente.")
+        
+    elif opcion == "3":
+        print("\nJugadores disponibles:")
+        contador = 1
+        for jugador in jugadores:
+            print(f"{contador}. {jugador.nombre} (dorsal {jugador.dorsal})")
+            contador += 1
+        
+        jugador_idx = int(input("Seleccione el número del jugador: ")) - 1
+        
+        print("\nEquipos disponibles:")
+        contador = 1
+        for equipo in equipos:
+            print(f"{contador}. {equipo.nombre_equipo}")
+            contador += 1
+        
+        equipo_idx = int(input("Seleccione el número del equipo: ")) - 1
+        
+        jugadores[jugador_idx].añadir_equipo(equipos[equipo_idx])
+        print(f"Jugador {jugadores[jugador_idx].nombre} asignado al equipo {equipos[equipo_idx].nombre_equipo}.")
+        
+    elif opcion == "4":
+        print("\n=== LISTA DE EQUIPOS ===")
+        for equipo in equipos:
+            print(f"- {equipo.nombre_equipo} ({len(equipo.jugadores_eq)} jugadores)")
+            
+    elif opcion == "5":
+        print("\nEquipos disponibles:")
+        contador = 1
+        for equipo in equipos:
+            print(f"{contador}. {equipo.nombre_equipo}")
+            contador += 1
+        
+        equipo_idx = int(input("Seleccione el número del equipo: ")) - 1
+        equipos[equipo_idx].mostrar_jugadores()
+        
+    elif opcion == "6":
+        print("¡Hasta luego!")
+        break
+    else:
+        print("Opción inválida. Por favor, seleccione una opción del 1 al 6.")
